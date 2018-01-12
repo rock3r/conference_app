@@ -1,4 +1,4 @@
-package com.yourcompany.dartconf;
+package org.dartlang.events.conferenceapp;
 
 import android.os.Bundle;
 
