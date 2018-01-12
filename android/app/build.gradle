@@ -40,43 +40,37 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName '1.0'
-        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+    }
+
+    signingConfigs {
+        debug {
+            def debugKeystore = loadSigningConfiguration('debug')
+            keyAlias debugKeystore['keyAlias']
+            keyPassword debugKeystore['keyPassword']
+            storeFile getKeystore(debugKeystore['storeFile'])
+            storePassword debugKeystore['storePassword']
+        }
+        release {
+            def debugKeystore = loadSigningConfiguration('release')
+            keyAlias debugKeystore['keyAlias']
+            keyPassword debugKeystore['keyPassword']
+            storeFile getKeystore(debugKeystore['storeFile'])
+            storePassword debugKeystore['storePassword']
+        }
     }
 
     buildTypes {
         debug {
-            def debugKeystore = loadSigningConfiguration('debug')
-            signingConfigs {
-                config {
-                    keyAlias debugKeystore['keyAlias']
-                    keyPassword debugKeystore['keyPassword']
-                    storeFile getKeystore(debugKeystore['storeFile'])
-                    storePassword debugKeystore['storePassword']
-                }
-            }
+            signingConfig signingConfigs.debug
         }
         release {
-            def debugKeystore = loadSigningConfiguration('release')
-            signingConfigs {
-                config {
-                    keyAlias debugKeystore['keyAlias']
-                    keyPassword debugKeystore['keyPassword']
-                    storeFile getKeystore(debugKeystore['storeFile'])
-                    storePassword debugKeystore['storePassword']
-                }
-            }
+            signingConfig signingConfigs.release
         }
     }
 }
 
 flutter {
     source '../..'
-}
-
-dependencies {
-    androidTestCompile 'com.android.support:support-annotations:27.0.2'
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
 }
 
 apply plugin: 'com.google.gms.google-services'
