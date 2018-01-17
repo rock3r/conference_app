@@ -184,9 +184,7 @@ class Session implements Comparable<Session> {
   String get id =>
       '${title.replaceAll(' ', '_')}-${date.day}-${time.hour}-${time.minute}';
 
-  String get descriptionParagraphs {
-    return description?.replaceAll('.  ', '.\n\n') ?? '';
-  }
+  String get descriptionParagraphs => addParagraphs(description) ?? '';
 
   String toString() => title;
 
@@ -202,10 +200,13 @@ class Session implements Comparable<Session> {
 
 final TextStyle titleStyle =
     const TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600);
-final TextStyle mutedTitleStyle = const TextStyle(
-    fontSize: 18.0, fontWeight: FontWeight.w600);
-final TextStyle authorStyle =
+final TextStyle dividerTitleStyle =
+    const TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600);
+final TextStyle detailsStyle =
     const TextStyle(fontWeight: FontWeight.w600, color: Colors.black54);
+final TextStyle descStyle = const TextStyle(fontSize: 16.0);
+final TextStyle subduedDescStyle =
+    const TextStyle(fontSize: 16.0, color: Colors.black54);
 
 class DividerCardWidget extends StatelessWidget {
   DividerCardWidget(this.session);
@@ -225,12 +226,24 @@ class DividerCardWidget extends StatelessWidget {
               children: <Widget>[
                 new Text(
                   session.title ?? '',
-                  style: mutedTitleStyle,
+                  style: dividerTitleStyle,
                   softWrap: false,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const Divider(),
-                new Text(session.time.format(context), style: authorStyle),
+                new Row(
+                  children: <Widget>[
+                    new Expanded(
+                      child: new Text(session.time.format(context), style: detailsStyle),
+                    ),
+                    new Text(
+                      session.duration == null || session.duration.inMinutes == 0
+                      ? ''
+                      : '${session.duration.inMinutes} min',
+                      style: detailsStyle,
+                    ),
+                  ]
+                )
               ],
             ),
           ),
@@ -292,12 +305,12 @@ class SessionCardWidget extends StatelessWidget {
                 ),
                 new Text(
                   session.presentersDescription,
-                  style: authorStyle,
+                  style: descStyle,
                 ),
                 const Padding(padding: const EdgeInsets.only(top: 8.0)),
                 new Text(
                   session.description ?? '',
-                  style: authorStyle,
+                  style: descStyle,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -306,13 +319,13 @@ class SessionCardWidget extends StatelessWidget {
                   children: <Widget>[
                     new Expanded(
                       child: new Text(session.time.format(context),
-                          style: authorStyle),
+                          style: detailsStyle),
                     ),
                     new Text(
-                      session.duration == null
+                      session.duration == null || session.duration.inMinutes == 0
                           ? ''
                           : '${session.duration.inMinutes} min',
-                      style: authorStyle,
+                      style: detailsStyle,
                     )
                   ],
                 ),
@@ -349,9 +362,6 @@ class SessionCardWidget extends StatelessWidget {
 }
 
 class SessionPage extends StatelessWidget {
-  static final TextStyle titleStyle =
-      const TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600);
-  static final TextStyle descStyle = const TextStyle(fontSize: 16.0);
   static final dateFormat = new DateFormat.MMMd();
 
   final Session session;
@@ -404,7 +414,8 @@ class SessionPage extends StatelessWidget {
                   ),
                   new Text(
                     '${dateFormat.format(session.date)}, '
-                        '${session.time.format(context)}',
+                        '${session.time.format(context)}, '
+                        '${session.duration.inMinutes} min',
                   ),
                   pad8(),
                   new Text(session.descriptionParagraphs, style: descStyle),
