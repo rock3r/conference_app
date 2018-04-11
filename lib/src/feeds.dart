@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert';
+import 'dart:convert' as convert show json;
 import 'dart:developer' show log;
 
 import 'package:flutter/material.dart';
@@ -230,11 +230,18 @@ class Feed implements Comparable<Feed> {
       user: json['user']['screen_name'],
       text: json['text'],
       created_at: _parseDates(json['created_at']),
-      hashtags: json['entities']['hashtags'].map((h) => h['text']).toList(),
+      hashtags: json['entities']['hashtags']
+          .map((h) => h['text'].toString())
+          .toList()
+          .cast<String>(),
       user_mentions: json['entities']['user_mentions']
-          .map((h) => h['screen_name'])
-          .toList(),
-      urls: json['entities']['urls'].map((u) => u['url']).toList(),
+          .map((h) => h['screen_name'].toString())
+          .toList()
+          .cast<String>(),
+      urls: json['entities']['urls']
+          .map((u) => u['url'].toString())
+          .toList()
+          .cast<String>(),
       favorite_count: json['favorite_count'],
     );
   }
@@ -301,7 +308,7 @@ class Feed implements Comparable<Feed> {
 }
 
 class FeedManager {
-  final http.Client httpClient = createHttpClient();
+  final http.Client httpClient = new http.Client();
 
   List<Feed> feeds;
 
@@ -353,7 +360,7 @@ class FeedManager {
     dynamic json;
 
     final String accessTokenData = response.body;
-    json = JSON.decode(accessTokenData);
+    json = convert.json.decode(accessTokenData);
 
     if (json is! Map) {
       throw 'Unexpected response from server.';
@@ -387,7 +394,7 @@ class FeedManager {
       },
     );
 
-    dynamic result = json.decode(response.body);
+    dynamic result = convert.json.decode(response.body);
 
     int rateLimit = int.parse(response.headers['x-rate-limit-limit'] ?? '0');
     int limitRemaining =
